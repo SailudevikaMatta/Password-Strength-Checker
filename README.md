@@ -105,8 +105,8 @@ To set up and run this project locally, follow the steps below:
 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/SailudevikaMatta/password-strength-checker
-cd password-strength-checker
+git clone https://github.com/SailudevikaMatta/Password-Strength-Checker
+cd Password-Strength-Checker
 ```
 
 2. **Install Dependencies**
