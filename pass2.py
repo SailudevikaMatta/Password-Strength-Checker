@@ -1,33 +1,24 @@
-#tkinter: Python’s standard library for building GUIs.
-#messagebox: Used for showing pop-up alerts.
-#zxcvbn: Evaluates password strength and gives feedback.
+# 👋 Let's build a friendly Password Strength Checker using Python's tkinter for GUI and zxcvbn for smart analysis
 
-import tkinter as tk
-from tkinter import messagebox
-from zxcvbn import zxcvbn
+import tkinter as tk                          # GUI toolkit that comes with Python
+from tkinter import messagebox               # To show warning popups
+from zxcvbn import zxcvbn                    # Library that checks password strength (like a smart advisor)
 
+# 🎯 Function to analyze password strength when button is clicked
+def check_password_strength():
+    user_password = password_input.get()     # Grab the password the user typed
 
-#This function is triggered when the user clicks “Check Strength”.
-#It retrieves the entered password from the entry widget.
-#If nothing is entered, it shows a warning dialog.
-def analyze_password():
-    password = password_entry.get()
-    if not password:
-        messagebox.showwarning("Input Error", "Please enter a password.")
+    if not user_password:                    # If nothing is entered, gently remind the user
+        messagebox.showwarning("Input Missing", "Oops! Please enter a password first.")
         return
 
+    # Analyze the password and get a report
+    password_analysis = zxcvbn(user_password)
+    strength_score = password_analysis['score']                  # Strength score from 0 to 4
+    improvement_tips = password_analysis['feedback']['suggestions']  # Suggestions to improve
 
-#zxcvbn() analyzes the password and returns:
-#a).A score from 0 (weak) to 4 (strong).
-#b).A list of suggestions on how to improve.  
-    result = zxcvbn(password)
-    score = result['score']
-    suggestions = result['feedback']['suggestions']
-    
-
-#Maps numeric score to human-readable text.
-#Updates the label on the GUI to show the strength.
-    strength_levels = {
+    # Convert the score into a user-friendly message with emoji feedback
+    score_to_text = {
         0: "Very Weak 😟",
         1: "Weak 😕",
         2: "Fair 😐",
@@ -35,43 +26,45 @@ def analyze_password():
         4: "Strong 💪"
     }
 
-    strength_label.config(text=f"Strength: {strength_levels[score]}")
+    # Show the password strength on screen
+    strength_display.config(text=f"Strength: {score_to_text[strength_score]}")
 
-
-#If feedback exists, show suggestions.
-#If no suggestions are needed (i.e., strong password), show positive message.    
-    if suggestions:
-        suggestions_text = "\n".join("- " + s for s in suggestions)
+    # If there are suggestions, display them nicely. If not, say it's a great password!
+    if improvement_tips:
+        tips_formatted = "\n".join(f"- {tip}" for tip in improvement_tips)
     else:
-        suggestions_text = "Great password! No suggestions needed."
+        tips_formatted = "✅ Great job! No improvements needed."
 
-    suggestions_label.config(text=f"{suggestions_text}")
+    suggestions_display.config(text=tips_formatted)
 
 
-#GUI SETUP BELOW
-root = tk.Tk()
-root.title("Password Strength Checker")
-root.geometry("400x300")
-root.configure(padx=20, pady=20)
+# 🖼️ Now let's build the GUI layout
 
-# Input Label and Entry
-label = tk.Label(root, text="Enter Password:", font=("Arial", 12))
-label.pack()
+# Create the main window
+window = tk.Tk()
+window.title("Password Strength Checker")     # Title of the app window
+window.geometry("400x300")                    # Set window size
+window.configure(padx=20, pady=20)            # Add a bit of spacing around the content
 
-password_entry = tk.Entry(root, show="*", font=("Arial", 12), width=30)
-password_entry.pack(pady=10)
+# Label asking the user to enter a password
+prompt_label = tk.Label(window, text="Enter your password:", font=("Arial", 12))
+prompt_label.pack()
 
-# Check Button
-check_button = tk.Button(root, text="Check Strength", command=analyze_password, font=("Arial", 12))
+# Entry box for the user to type their password (characters are hidden)
+password_input = tk.Entry(window, show="*", font=("Arial", 12), width=30)
+password_input.pack(pady=10)
+
+# Button that checks the password when clicked
+check_button = tk.Button(window, text="Check Strength", command=check_password_strength, font=("Arial", 12))
 check_button.pack(pady=5)
 
-# Strength Display
-strength_label = tk.Label(root, text="", font=("Arial", 12, "bold"))
-strength_label.pack(pady=10)
+# Label that shows the strength result
+strength_display = tk.Label(window, text="", font=("Arial", 12, "bold"))
+strength_display.pack(pady=10)
 
-# Suggestions Display
-suggestions_label = tk.Label(root, text="", font=("Arial", 10), justify="left", wraplength=350)
-suggestions_label.pack()
+# Label that shows suggestions (if any)
+suggestions_display = tk.Label(window, text="", font=("Arial", 10), justify="left", wraplength=350)
+suggestions_display.pack()
 
-# Start GUI Event Loop
-root.mainloop()
+# 🚀 Start the application — this keeps the window open and interactive
+window.mainloop()
